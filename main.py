@@ -13,11 +13,26 @@ to hold 2 out of 3 slots if they do not get a winning combination.
 """
 # Imports
 import os
+import random
+
 
 # Constant Declaration
-SLOT_OPTIONS = ["🍒", "🍋", "7", "\033[37mBAR", "💎", "JACKPOT!"]
+class style:
+    # All styles use ANSI COLORS CODES
+    DIAMOND = '\033[1;30;44m'
+    SEVEN_NUM = '\033[1;30;41m'
+    SEVEN = '\033[0;34;41m'
+    FRUIT = '\033[0;30;107m'
+    BAR = '\033[1;37;40m'
+    DEFAULT = '\033[0m'
 
-print(SLOT_OPTIONS)
+
+SLOT_OPTIONS = [style.FRUIT + "   CH🍒RRY  " + style.DEFAULT, style.FRUIT + "   LEM🍋N   " + style.DEFAULT, style.SEVEN
+                + "   SE" + style.SEVEN_NUM + '7' + style.SEVEN + "EN    " + style.DEFAULT, style.BAR + "    BAR!    " +
+                style.DEFAULT, style.DIAMOND + "  DIA💎OND  " + style.DEFAULT, " JACKPOT "]
+
+# ^ Each entry has a field-with of 9.
+
 TITLE = """
 |==================================|
 |   Welcome to the Slot Machine!   |
@@ -61,8 +76,6 @@ print(TITLE % credit)
 input()
 os.system('cls')
 
-
-
 # Main Loop
 while not gameover:
     print(OPTIONS % credit)
@@ -78,9 +91,6 @@ while not gameover:
     else:
         os.system('cls')
         print("Placeholder Invalid input system")
-
-        
-
 
 # Goodbye Message
 os.system('cls')
