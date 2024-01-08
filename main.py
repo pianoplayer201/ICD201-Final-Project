@@ -14,6 +14,7 @@ to hold 2 out of 3 slots if they do not get a winning combination.
 # Imports
 import os
 
+from sys import exit
 
 # Constant Declaration
 SLOT_OPTIONS = ["🍒", "🍋", "7", "\033[37mBAR", "💎", "JACKPOT!"]
