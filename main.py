@@ -13,10 +13,12 @@ to hold 2 out of 3 slots if they do not get a winning combination.
 """
 # Imports
 import os
-import enum
+
 
 # Constant Declaration
-SLOT_OPTIONS = ["Cherry", "Lemon", "777", "Bar", "Diamond", "Jackpot"]
+SLOT_OPTIONS = ["🍒", "🍋", "7", "\033[37mBAR", "💎", "JACKPOT!"]
+
+print(SLOT_OPTIONS)
 TITLE = """
 |==================================|
 |   Welcome to the Slot Machine!   |
@@ -59,6 +61,8 @@ slot3 = None
 print(TITLE % credit)
 input()
 os.system('cls')
+
+
 
 # Main Loop
 while not gameover:
