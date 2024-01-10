@@ -14,7 +14,6 @@ to hold 2 out of 3 slots if they do not get a winning combination.
 # Imports
 import os
 import random
-import tkinter
 
 
 # Constant Declaration
@@ -25,23 +24,26 @@ class Style:
     SEVEN = '\033[0;34;41m'
     FRUIT = '\033[0;30;107m'
     BAR = '\033[1;37;40m'
-    #9 Character Offset for HIGHLIGHT + DEFAULT
+    JACKPOT = '\033[1;30;43m'
+    # 9 Character Offset for HIGHLIGHT + DEFAULT
     DEFAULT = '\033[0m'
     HIGHLIGHT = '\033[92m'
 
 
 SLOT_OPTIONS = [Style.FRUIT + "   CH🍒RRY  " + Style.DEFAULT, Style.FRUIT + "   LEM🍋N   " + Style.DEFAULT, Style.SEVEN
                 + "   SE" + Style.SEVEN_NUM + '7' + Style.SEVEN + "EN    " + Style.DEFAULT, Style.BAR + "    BAR!    " +
-                Style.DEFAULT, Style.DIAMOND + "  DIA💎OND  " + Style.DEFAULT, " JACKPOT "]
+                Style.DEFAULT, Style.DIAMOND + "  DIA💎OND  " + Style.DEFAULT,
+                Style.JACKPOT + "   JACKPOT  " + Style.DEFAULT]
 
 
 # ^ Each entry has a field-with of 9.
 
 class DisplayBlock:
-    DEFAULT = "| %-32s |"
-    DIVIDER = "|----------------------------------|"
-    DEFAULT_HIGHLIGHT = "| %-41s |"
-    BORDER = "|==================================|"
+    DEFAULT = "| %-36s |"
+    DIVIDER = "|--------------------------------------|"
+    DEFAULT_HIGHLIGHT = "| %-45s |"
+    BORDER = "|======================================|"
+    SLOTS = """|-----\\/-----------\\/-----------\\/-----|\n|%s|%s|%s|\n|-----/\\-----------/\\-----------/\\-----|"""
 
     class Title:
         TITLE_INTRO = "Welcome to the Slot Machine"
@@ -50,26 +52,11 @@ class DisplayBlock:
     class Info:
         CREDIT_COUNT = "You have " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " credits."
 
-    TITLE = """
-|==================================|
-|   Welcome to the Slot Machine!   |
-|----------------------------------|
-|  You have %-3d credits to start   |
-|----------------------------------|
-| Press ENTER to start the game!   |
-|==================================|
-"""
-    OPTIONS = """
-|==================================|
-|   You have %-3d credits           |
-|==================================|
-|  What would you like to do?      |
-|----------------------------------|
-|  [B]et                           |   
-|  [H]old                          | 
-|  [Q]uit                          |
-|==================================|
-"""
+    class Options:
+        BET_PROMPT = "Please input # of credits to bet:"
+        BET_OPTIONS = Style.HIGHLIGHT + "        [1]  [2]  [5]  [10]" + Style.DEFAULT
+        QUIT = "Press " + Style.HIGHLIGHT + "[Q]" + Style.DEFAULT + " to quit."
+
     GOODBYE = """
 |==================================|
 |   Game Over, Thanks for Playing! |
@@ -85,15 +72,16 @@ class DisplayBlock:
 # Variable Declaration
 credit = 100
 gameover = False
-slot1 = None
-slot2 = None
-slot3 = None
+slots_array = random.choices(SLOT_OPTIONS, k=3)
+bet_amount = -1
+userInput = ""
 
 
 # Define Methods for printing different screens.
 class Screen:
     @staticmethod
     def titleScreen():
+        os.system('cls')
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % DisplayBlock.Title.TITLE_INTRO)
         print(DisplayBlock.DIVIDER)
@@ -101,29 +89,53 @@ class Screen:
         print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Title.TITLE_PROMPT)
         print(DisplayBlock.BORDER)
+        input()
 
+    @staticmethod
+    def slotScreen():
+        print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+
+    @staticmethod
+    def invalidInput():
+        print("Invalid Input")
+    @staticmethod
+    def optionsScreen():
+        global gameover
+        global bet_amount
+        global userInput
+        os.system('cls')
+
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT % DisplayBlock.Options.BET_PROMPT)
+        print(DisplayBlock.DIVIDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.BET_OPTIONS)
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
+        print(DisplayBlock.BORDER)
+
+        # Check Input
+        userInput = input().upper()
+        if userInput == 'Q':
+            gameover = True
+        elif userInput == '1':
+            bet_amount = 1
+        elif userInput == '2':
+            bet_amount = 2
+        elif userInput == '5':
+            bet_amount = 5
+        elif userInput == '10':
+            bet_amount = 10
 
 # Print Out Intro
-
 Screen.titleScreen()
-input()
-os.system('cls')
 
 # Main Loop
 while not gameover:
-    print(DisplayBlock.OPTIONS % credit)
-    userInput = input().upper()
-    if userInput == 'Q':
-        gameover = True
-    elif userInput == "H":
-        os.system('cls')
-        print("Placeholder Hold System")
-    elif userInput == "B":
-        os.system('cls')
-        print("Placeholder Bet System")
-    else:
-        os.system('cls')
-        print("Placeholder Invalid input system")
+    Screen.optionsScreen()
 
 # Goodbye Message
 os.system('cls')
