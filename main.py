@@ -68,7 +68,6 @@ class DisplayBlock:
 |==================================|
     """
 
-
 # Variable Declaration
 credit = 100
 gameover = False
@@ -82,8 +81,24 @@ hold3 = False
 minimumAge = 18
 
 
-# Define Methods for printing different screens.
-
+# Define Methods and Functions for printing different screens, hold toggle, and bet-reward calculations
+def toggleHold(slot):
+    global hold1, hold2, hold3
+    if slot == 1:
+        if hold1:
+            hold1 = False
+        else:
+            hold1 = True
+    elif slot == 2:
+        if hold2:
+            hold2 = False
+        else:
+            hold2 = True
+    elif slot == 3:
+        if hold3:
+            hold3 = False
+        else:
+            hold3 = True
 class Screen:
     @staticmethod
     def titleScreen():
@@ -115,6 +130,20 @@ class Screen:
     @staticmethod
     def slotScreen():
         print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+
+    def holdScreen():
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Info.CREDIT_COUNT)
+        print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT % DisplayBlock.Options.BET_PROMPT)
+        print(DisplayBlock.DIVIDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.BET_OPTIONS)
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
+        print(DisplayBlock.BORDER)
+
+
 
     @staticmethod
     def invalidInput(origin):
@@ -173,12 +202,16 @@ class Screen:
             gameover = True
         elif userInput == '1':
             bet_amount = 1
+            Screen.holdScreen()
         elif userInput == '2':
             bet_amount = 2
+            Screen.holdScreen()
         elif userInput == '5':
             bet_amount = 5
+            Screen.holdScreen()
         elif userInput == '10':
             bet_amount = 10
+            Screen.holdScreen()
         else:
             Screen.invalidInput("BET")
 
@@ -212,7 +245,7 @@ if userInput > 999999999999999999:
 
 while userInput <= 5:
     os.system('cls || clear')
-    userInput = input("That's a sad amount! How about this, I'll give you as many credits you want, on the house!\nJust tell me how many you want:\n")
+    userInput = input("That's a sad amount! I'll give you as many credits you want, on the house!\nJust tell me how many you want:\n")
     while not userInput.isnumeric():
         os.system('cls || clear')
         userInput = input("I need a number, not a story. Just give me the number of your dreams,\nand I'll give you that many!\n")
