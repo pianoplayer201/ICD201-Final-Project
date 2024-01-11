@@ -119,22 +119,46 @@ class Screen:
         print(DisplayBlock.BORDER)
         input()
 
+    def creditAdd():
+        global credit, userInput
+        os.system('cls || clear')
+        print(DisplayBlock.BORDER)
+        print(DisplayBlock.DEFAULT % "Please enter # of credits to add.")
+        print(DisplayBlock.BORDER)
+        userInput = input()
+
+        if userInput.isnumeric():
+            credit += int(userInput)
+        else:
+            Screen.invalidInput("CREDITADD")
+
     @staticmethod
     def outOfCredit():
+        global userInput, credit, gameover
         os.system('cls || clear')
 
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "Not enough Credits!" + Style.DEFAULT))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Press " + Style.HIGHLIGHT + "[+]" + Style.DEFAULT + "to add more credits."))
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "        OR" + Style.DEFAULT))
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
+                    "Press " + Style.HIGHLIGHT + "[+]" + Style.DEFAULT + " to add more credits."))
+        print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to try another bet."))
+                    "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " (by itself)"))
+        print(DisplayBlock.DEFAULT % "to try a cheaper bet.")
+        print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
         print(DisplayBlock.BORDER)
-        input()
+        userInput = input()
+        if userInput.upper() == '+':
+            Screen.creditAdd()
+        elif userInput.upper() == 'Q':
+            gameover = True
+        elif userInput.upper() == "":
+            Screen.betOptionsScreen()
+        else:
+            Screen.invalidInput("CREDITOPTIONS")
+
 
     @staticmethod
     def slotScreen():
@@ -142,8 +166,6 @@ class Screen:
 
     @staticmethod
     def invalidInput(origin):
-        if credit <= 0 or credit < bet_amount:
-            Screen.outOfCredit()
         os.system('cls || clear')
 
         print(DisplayBlock.BORDER)
@@ -159,6 +181,10 @@ class Screen:
             Screen.betOptionsScreen()
         elif origin == "HOLD":
             Screen.holdOptionsScreen()
+        elif origin == "CREDITOPTIONS":
+            Screen.outOfCredit()
+        elif origin == "CREDITADD":
+            Screen.creditAdd()
 
     @staticmethod
     def holdOptionsScreen():
@@ -190,17 +216,17 @@ class Screen:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (3, DisplayBlock.Info.HELD_FALSE)))
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % ("Enter " + Style.HIGHLIGHT + "[SPIN]" + Style.DEFAULT + " to confirm and spin!"))
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % ("Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
         print(DisplayBlock.BORDER)
 
         userInput = input()
-        if not userInput == '1' and not userInput == '2' and not userInput == '3' and not userInput.upper() == 'SPIN':
+        if not userInput.upper() == '1' and not userInput.upper() == '2' and not userInput.upper() == '3' and not userInput.upper() == 'SPIN':
             Screen.invalidInput("HOLD")
-        elif userInput == '1':
+        elif userInput.upper() == '1':
             toggleHold(1)
-        elif userInput == '2':
+        elif userInput.upper() == '2':
             toggleHold(2)
-        elif userInput == '3':
+        elif userInput.upper() == '3':
             toggleHold(3)
         else:
             Screen.slotScreen()
@@ -223,18 +249,21 @@ class Screen:
 
         # Check Input
         userInput = input().upper()
-        if userInput == 'Q':
+        if userInput.upper() == 'Q':
             gameover = True
-        elif userInput == '1':
+        elif userInput.upper() == '1':
             bet_amount = 1
-        elif userInput == '2':
+        elif userInput.upper() == '2':
             bet_amount = 2
-        elif userInput == '5':
+        elif userInput.upper() == '5':
             bet_amount = 5
-        elif userInput == '10':
+        elif userInput.upper() == '10':
             bet_amount = 10
         else:
             Screen.invalidInput("BET")
+
+        if credit <= 0 or credit < bet_amount:
+            Screen.outOfCredit()
 
         if canHold:
             Screen.holdOptionsScreen()
@@ -279,6 +308,8 @@ Screen.titleScreen()
 
 # Main Loop
 while not gameover:
+    if credit <= 0 or credit < bet_amount:
+        Screen.outOfCredit()
     Screen.betOptionsScreen()
 
 # Goodbye Message
