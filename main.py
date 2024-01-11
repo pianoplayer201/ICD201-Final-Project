@@ -193,6 +193,7 @@ class Screen:
 
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Info.CREDIT_COUNT % credit)
+        print(DisplayBlock.BORDER)
         print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % DisplayBlock.Options.HOLD_PROMPT)
