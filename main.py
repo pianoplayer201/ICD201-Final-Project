@@ -14,10 +14,12 @@ to hold 2 out of 3 slots if they do not get a winning combination.
 # Imports
 import os
 import random
-
+import time
 
 # Constant Declaration
 MINIMUM_AGE = 18
+
+
 class Style:
     # All styles use ANSI COLORS CODES
     DIAMOND = '\033[1;30;44m'
@@ -73,11 +75,14 @@ class DisplayBlock:
 |==================================|
     """
 
+
 # Variable Declaration
 credit = 100
+oldSlot = ""
+bet_amount = -1
+win_amount = -1
 gameover = False
 slots_array = random.choices(SLOT_OPTIONS, k=3)
-bet_amount = -1
 userInput = ""
 canHold = True
 hold1 = False
@@ -88,7 +93,6 @@ hold3 = False
 # Define Methods and Functions for printing different screens, hold toggle, and bet-reward calculations
 def toggleHold(slot):
     global hold1, hold2, hold3, canHold
-    canHold = False
     if slot == 1:
         if hold1:
             hold1 = False
@@ -99,12 +103,13 @@ def toggleHold(slot):
             hold2 = False
         else:
             hold2 = True
-    elif slot == 3:
+    else:
         if hold3:
             hold3 = False
         else:
             hold3 = True
     Screen.holdOptionsScreen()
+
 
 class Screen:
     @staticmethod
@@ -141,14 +146,15 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "Not enough Credits!" + Style.DEFAULT))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Press " + Style.HIGHLIGHT + "[+]" + Style.DEFAULT + " to add more credits."))
+                "Press " + Style.HIGHLIGHT + "[+]" + Style.DEFAULT + " to add more credits."))
         print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " (by itself)"))
+                "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " (by itself)"))
         print(DisplayBlock.DEFAULT % "to try a cheaper bet.")
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
         print(DisplayBlock.BORDER)
+
         userInput = input()
         if userInput.upper() == '+':
             Screen.creditAdd()
@@ -159,10 +165,47 @@ class Screen:
         else:
             Screen.invalidInput("CREDITOPTIONS")
 
-
     @staticmethod
     def slotScreen():
-        print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+        global credit, bet_amount, hold1, hold2, hold3, slots_array, oldSlot
+        os.system('cls || clear')
+        credit = credit - bet_amount
+        for i in range(50):
+
+            # Check for Holds, and ensure that every new animation is a new slot type (No repeat Cherries)
+            if not hold1:
+                oldSlot = slots_array[0]
+                while oldSlot == slots_array[0]:
+                    slots_array[0] = random.choice(SLOT_OPTIONS)
+            if not hold2:
+                oldSlot = slots_array[1]
+                while oldSlot == slots_array[1]:
+                    slots_array[1] = random.choice(SLOT_OPTIONS)
+            if not hold3:
+                oldSlot = slots_array[2]
+                while oldSlot == slots_array[2]:
+                    slots_array[2] = random.choice(SLOT_OPTIONS)
+
+            # To stop flickering, slow down speed
+            time.sleep(1 / 2.5)
+            os.system('cls || clear')
+
+            if i < 40:
+                # Timer to make the slot machine slow down to a rolling stop.
+                time.sleep((i / 100) ** 2)
+
+            print(DisplayBlock.BORDER)
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
+            print(DisplayBlock.BORDER)
+            print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
+            print(DisplayBlock.BORDER)
+            print(DisplayBlock.DEFAULT % "")
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "          %d   SPINNING!!" % i + Style.DEFAULT))
+            print(DisplayBlock.DEFAULT % "")
+            print(DisplayBlock.DIVIDER)
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (
+                        "Bet amount: " + Style.HIGHLIGHT + str(bet_amount) + " CREDITS" + Style.DEFAULT))
+            print(DisplayBlock.BORDER)
 
     @staticmethod
     def invalidInput(origin):
@@ -171,15 +214,23 @@ class Screen:
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
+
+        # Make Error message more precise for too many holds
+        if origin == "3HOLD":
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (
+                        "You can only hold " + Style.HIGHLIGHT + "MAX 2 SLOTS" + Style.DEFAULT))
+        else:
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
+
+        print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to try again."))
+                "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to try again."))
         print(DisplayBlock.BORDER)
         input()
 
         if origin == "BET":
             Screen.betOptionsScreen()
-        elif origin == "HOLD":
+        elif origin == "HOLD" or origin == "3HOLD":
             Screen.holdOptionsScreen()
         elif origin == "CREDITOPTIONS":
             Screen.outOfCredit()
@@ -188,11 +239,11 @@ class Screen:
 
     @staticmethod
     def holdOptionsScreen():
-        global bet_amount, userInput, hold1, hold2, hold3, canHold
+        global bet_amount, userInput, hold1, hold2, hold3, canHold, slots_array
         os.system('cls || clear')
 
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Info.CREDIT_COUNT % credit)
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
         print(DisplayBlock.BORDER)
@@ -217,7 +268,8 @@ class Screen:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (3, DisplayBlock.Info.HELD_FALSE)))
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % ("Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (
+                    "Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
         print(DisplayBlock.BORDER)
 
         userInput = input()
@@ -230,10 +282,17 @@ class Screen:
         elif userInput.upper() == '3':
             toggleHold(3)
         else:
-            Screen.slotScreen()
+            if hold1 and hold2 and hold3:
+                Screen.invalidInput("3HOLD")
+            elif hold1 or hold2 or hold3:
+                canHold = False
+                Screen.slotScreen()
+            else:
+                canHold = True
+                Screen.slotScreen()
 
     def betOptionsScreen():
-        global gameover, bet_amount, userInput, hold1, hold2, hold3, canHold
+        global gameover, bet_amount, userInput, hold1, hold2, hold3, canHold, slots_array
         os.system('cls || clear')
 
         print(DisplayBlock.BORDER)
@@ -263,10 +322,17 @@ class Screen:
         else:
             Screen.invalidInput("BET")
 
+        if hold1 or hold2 or hold3:
+            canHold = False
+        else:
+            canHold = True
+
         if credit <= 0 or credit < bet_amount:
             Screen.outOfCredit()
-
-        if canHold:
+        elif canHold:
+            hold1 = False
+            hold2 = False
+            hold3 = False
             Screen.holdOptionsScreen()
         else:
             hold1 = False
@@ -276,7 +342,8 @@ class Screen:
 
 
 # Ask how many Credits you have today?
-userInput = input("As you walk into the Casino, you wonder how much you can afford.\nHow many credits did you bring with you?\n")
+userInput = input(
+    "As you walk into the Casino, you wonder how much you can afford.\nHow many credits did you bring with you?\n")
 
 while not userInput.lstrip('-').isnumeric():
     os.system('cls || clear')
@@ -292,14 +359,17 @@ if userInput > 999999999999999999:
 
 while userInput <= 5:
     os.system('cls || clear')
-    userInput = input("That's a sad amount! I'll give you as many credits you want, on the house!\nJust tell me how many you want:\n")
+    userInput = input(
+        "That's a sad amount! I'll give you as many credits you want, on the house!\nJust tell me how many you want:\n")
     while not userInput.isnumeric():
         os.system('cls || clear')
-        userInput = input("I need a number, not a story. Just give me the number of your dreams,\nand I'll give you that many!\n")
+        userInput = input(
+            "I need a number, not a story. Just give me the number of your dreams,\nand I'll give you that many!\n")
     userInput = int(userInput)
     if userInput > 999999999999999999:
         os.system('cls || clear')
-        print("Woah there buddy, don't put me out of business! Since you're being annoying, Ill just give you " + Style.HIGHLIGHT + "100 Credits" + Style.DEFAULT)
+        print(
+            "Woah there buddy, don't put me out of business! Since you're being annoying, Ill just give you " + Style.HIGHLIGHT + "100 Credits" + Style.DEFAULT)
         userInput = 100
         input("Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to go to the slot machine.")
 credit = userInput
@@ -309,8 +379,6 @@ Screen.titleScreen()
 
 # Main Loop
 while not gameover:
-    if credit <= 0 or credit < bet_amount:
-        Screen.outOfCredit()
     Screen.betOptionsScreen()
 
 # Goodbye Message
