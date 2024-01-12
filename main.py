@@ -20,7 +20,6 @@ import math
 # Constant Declaration
 MINIMUM_AGE = 18
 
-
 class Style:
     # All styles use ANSI COLORS CODES
     DIAMOND = '\033[1;30;44m'
@@ -99,21 +98,14 @@ hold3 = False
 def toggleHold(slot):
     global hold1, hold2, hold3, canHold
     if slot == 1:
-        if hold1:
-            hold1 = False
-        else:
-            hold1 = True
+        hold1 = not hold1
     elif slot == 2:
-        if hold2:
-            hold2 = False
-        else:
-            hold2 = True
+        hold2 = not hold2
     else:
-        if hold3:
-            hold3 = False
-        else:
-            hold3 = True
+        hold3 = not hold3
+
     Screen.holdOptionsScreen()
+
 
 def winCalculation():
     global slots_array, credit
@@ -122,11 +114,10 @@ def winCalculation():
         credit += bet_amount
         Screen.winScreen("CHERRY1")
     elif slots_array[0] == SLOT_OPTIONS[0] and slots_array[1] == SLOT_OPTIONS[0] and slots_array[2] != SLOT_OPTIONS[0]:
-        credit += bet_amount*2
+        credit += bet_amount * 2
         Screen.winScreen("CHERRY2")
     elif slots_array[0] == SLOT_OPTIONS[0] and slots_array[1] == SLOT_OPTIONS[0] and slots_array[2] == SLOT_OPTIONS[0]:
         Screen.winScreen()
-
 
 
 class Screen:
@@ -202,6 +193,7 @@ class Screen:
             Screen.creditAdd()
         elif userInput.upper() == 'Q':
             gameover = True
+            return
         elif userInput.upper() == "":
             Screen.betOptionsScreen()
         else:
@@ -233,7 +225,7 @@ class Screen:
 
             if i > 17:
                 # Timer to make the slot machine slow down to a rolling stop.
-                time.sleep(((i-10)**0.6)/3)
+                time.sleep(((i - 10) ** 0.6) / 3)
 
             os.system('cls || clear')
 
@@ -248,12 +240,11 @@ class Screen:
             print(DisplayBlock.DEFAULT % "")
             print(DisplayBlock.DIVIDER)
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                        "Bet amount: " + Style.HIGHLIGHT + str(bet_amount) + " CREDITS" + Style.DEFAULT))
+                    "Bet amount: " + Style.HIGHLIGHT + str(bet_amount) + " CREDITS" + Style.DEFAULT))
             print(DisplayBlock.BORDER)
 
         time.sleep(2)
         winCalculation()
-
 
     @staticmethod
     def invalidInput(origin):
@@ -267,7 +258,7 @@ class Screen:
         # Make Error message more precise for too many holds
         if origin == "3HOLD":
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                        "You can only hold " + Style.HIGHLIGHT + "MAX 2 SLOTS" + Style.DEFAULT))
+                    "You can only hold " + Style.HIGHLIGHT + "MAX 2 SLOTS" + Style.DEFAULT))
         else:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
 
@@ -319,7 +310,7 @@ class Screen:
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (3, DisplayBlock.Info.HELD_FALSE)))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    "Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
+                "Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
         print(DisplayBlock.BORDER)
 
         userInput = input()
@@ -343,7 +334,7 @@ class Screen:
 
     @staticmethod
     def betOptionsScreen():
-        global gameover, bet_amount, userInput, hold1, hold2, hold3, canHold, slots_array
+        global gameover, bet_amount, userInput, hold1, hold2, hold3, canHold, slots_array,
         os.system('cls || clear')
 
         print(DisplayBlock.BORDER)
@@ -363,14 +354,9 @@ class Screen:
         userInput = input().upper()
         if userInput.upper() == 'Q':
             gameover = True
-        elif userInput.upper() == '1':
-            bet_amount = 1
-        elif userInput.upper() == '2':
-            bet_amount = 2
-        elif userInput.upper() == '5':
-            bet_amount = 5
-        elif userInput.upper() == '10':
-            bet_amount = 10
+            return
+        elif userInput in ['1', '2', '5', '10']:
+            bet_amount = int(userInput)
         else:
             Screen.invalidInput("BET")
 
