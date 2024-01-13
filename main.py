@@ -69,9 +69,11 @@ class DisplayBlock:
 
     class GAMEOVER:
         GOODBYE = "Game Over, Thanks for Playing!"
-        WIN_COUNT = "You won: " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
-        LOSE_COUNT = "You lost: " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
+        WIN_COUNT = "You won " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
+        LOSE_COUNT = "You lost " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
         CREDIT_FINISH = "You left with: " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " credits"
+        CREDIT_CHANGE = "TOTAL %s: " + Style.HIGHLIGHT + "%d" + " credits." + Style.DEFAULT
+
 
 
     GOODBYE = """
@@ -476,15 +478,20 @@ class Screen:
     def quitScreen():
         os.system('cls || clear')
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.GAMEOVER.GOODBYE)
+        print(DisplayBlock.DEFAULT % DisplayBlock.GAMEOVER.GOODBYE)
         print(DisplayBlock.BORDER)
-        print("STATISTICS:")
-        print(DisplayBlock.GAMEOVER.WIN_COUNT % countSpinWin)
+        print(DisplayBlock.DEFAULT % "STATISTICS:")
         print(DisplayBlock.DIVIDER)
-        print(DisplayBlock.GAMEOVER.LOSE_COUNT % countSpinLoss)
-        print(DisplayBlock.DIVIDER)
-        print(DisplayBlock.GAMEOVER.)
-
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.WIN_COUNT % countSpinWin))
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.LOSE_COUNT % countSpinLoss))
+        print(DisplayBlock.BORDER)
+        if credit-originalCredit > 0:
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "NICE JOB!" + Style.DEFAULT))
+        else:
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("LOSS", credit - originalCredit)))
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "BETTER LUCK NEXT TIME!" + Style.DEFAULT))
+        print(DisplayBlock.BORDER)
 
 # Ask how many Credits you have today?
 userInput = input(
