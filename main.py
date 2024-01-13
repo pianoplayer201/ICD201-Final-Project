@@ -239,6 +239,7 @@ class Screen:
             DisplayBlock.DEFAULT_HIGHLIGHT % ("Press" + Style.HIGHLIGHT + " [Enter] " + Style.DEFAULT + "to continue."))
         print(DisplayBlock.BORDER)
         input()
+        Screen.betOptionsScreen()
 
     @staticmethod
     def creditAdd():
