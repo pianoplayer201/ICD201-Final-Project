@@ -19,6 +19,7 @@ import math
 
 # Constant Declaration
 
+# The Style class defines various ANSI color codes for different styles.
 class Style:
     # All styles use ANSI COLORS CODES
     DIAMOND = '\033[1;30;44m'
@@ -32,6 +33,9 @@ class Style:
     HIGHLIGHT = '\033[92m'
 
 
+# The above code is defining a list called SLOT_OPTIONS. Each element in the list represents a slot machine option, with
+# different symbols and styles. The symbols include a cherry, lemon, number 7, bar, diamond, and jackpot. The styles are
+# applied using the Style class, which is not shown in the code snippet.
 SLOT_OPTIONS = [Style.FRUIT + "   CH🍒RRY  " + Style.DEFAULT, Style.FRUIT + "   LEM🍋N   " + Style.DEFAULT, Style.SEVEN
                 + "   SE" + Style.SEVEN_NUM + '7' + Style.SEVEN + "EN    " + Style.DEFAULT, Style.BAR + "    BAR!    " +
                 Style.DEFAULT, Style.DIAMOND + "  DIA💎OND  " + Style.DEFAULT,
@@ -40,6 +44,7 @@ SLOT_OPTIONS = [Style.FRUIT + "   CH🍒RRY  " + Style.DEFAULT, Style.FRUIT + " 
 
 # ^ Each entry has a field-with of 9.
 
+# The above class defines various display messages and formatting options for a slot machine game.
 class DisplayBlock:
     DEFAULT = "| %-36s |"
     DIVIDER = "|--------------------------------------|"
@@ -172,6 +177,12 @@ class Screen:
 
     @staticmethod
     def winScreenFlicker(message):
+        """
+        The function `winScreenFlicker` clears the console screen, displays various information and messages, and prints the
+        current state of a slot machine game.
+        
+        :param message: The `message` parameter is a string that represents the message to be displayed on the win screen
+        """
         os.system('cls||clear')
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
