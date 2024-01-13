@@ -404,11 +404,11 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.BET_AMOUNT % betAmount))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                "Enter " + Style.HIGHLIGHT + "\"SPIN\"" + Style.DEFAULT + " to confirm and spin!"))
+                "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to confirm and spin!"))
         print(DisplayBlock.BORDER)
 
         userInput = input().upper().strip()
-        if not userInput.upper() == '1' and not userInput.upper() == '2' and not userInput.upper() == '3' and not userInput.upper() == 'SPIN':
+        if not userInput.upper() == '1' and not userInput.upper() == '2' and not userInput.upper() == '3' and not userInput.upper() == "":
             Screen.invalidInput("HOLD")
         elif userInput.upper() == '1':
             toggleHold(1)
