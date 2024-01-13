@@ -1,7 +1,7 @@
 """
 Programmer: Ryan Mehrian
-Date: December 12, 2023
-Last Modified:
+Date Created: December 12, 2023
+Last Modified: January
 -----
 This program is a game emulating a casino's slot machine. The user will start with 100
 "credits", and they will be given the choice to bet 1, 2, 5, or 10 credits, with each
@@ -18,8 +18,6 @@ import time
 import math
 
 # Constant Declaration
-MINIMUM_AGE = 18
-
 
 class Style:
     # All styles use ANSI COLORS CODES
@@ -192,7 +190,6 @@ class Screen:
     def winScreen(outcome):
         global winMessage, betAmount, winOutput, winAmount, credit, jackpot, didWin, countSpinWin, countSpinLoss
         credit += winAmount
-        os.system('cls || clear')
 
         # Set win message
         if outcome == "JACKPOT":
