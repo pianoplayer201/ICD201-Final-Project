@@ -17,45 +17,52 @@ import random
 import time
 import math
 
-# Constant Declaration
 
-# The Style class defines various ANSI color codes for different styles.
+# --- Constant Declaration ---
+
+# Style class to store all ANSI Colour Codes used in the program.
 class Style:
-    # All styles use ANSI COLORS CODES
+    # Styling text for SLOTS
     DIAMOND = '\033[1;30;44m'
     SEVEN_NUM = '\033[1;30;41m'
     SEVEN = '\033[0;34;41m'
     FRUIT = '\033[0;30;107m'
     BAR = '\033[1;37;40m'
     JACKPOT = '\033[1;30;43m'
-    # 9 Character Offset for HIGHLIGHT + DEFAULT
+
+    # Styling text in PROMPTS and UI
     DEFAULT = '\033[0m'
     HIGHLIGHT = '\033[92m'
 
+    # NOTE TO SELF: ^ 9 Character Offset for HIGHLIGHT + DEFAULT
 
-# The above code is defining a list called SLOT_OPTIONS. Each element in the list represents a slot machine option, with
-# different symbols and styles. The symbols include a cherry, lemon, number 7, bar, diamond, and jackpot. The styles are
-# applied using the Style class, which is not shown in the code snippet.
+
+# An array that stores every possible option in the slot machine per slot.
 SLOT_OPTIONS = [Style.FRUIT + "   CH🍒RRY  " + Style.DEFAULT, Style.FRUIT + "   LEM🍋N   " + Style.DEFAULT, Style.SEVEN
                 + "   SE" + Style.SEVEN_NUM + '7' + Style.SEVEN + "EN    " + Style.DEFAULT, Style.BAR + "    BAR!    " +
                 Style.DEFAULT, Style.DIAMOND + "  DIA💎OND  " + Style.DEFAULT,
                 Style.JACKPOT + "   JACKPOT  " + Style.DEFAULT]
 
 
-# ^ Each entry has a field-with of 9.
-
-# The above class defines various display messages and formatting options for a slot machine game.
+# DisplayBlock Class to store every possible printed line as a string, used later as modules to print a screen.
 class DisplayBlock:
+    # Blank, bordered lines. Different fieldwidths to account for Style.Highlight + Style.Default ANSI keycode characters.
     DEFAULT = "| %-36s |"
-    DIVIDER = "|--------------------------------------|"
     DEFAULT_HIGHLIGHT = "| %-45s |"
+
+    # Different Borders, to better user experience and UI readability.
+    DIVIDER = "|--------------------------------------|"
     BORDER = "|======================================|"
+
+    # String to print out the SLOTS of the slot machine. Accepts 3 strings, drawn randomly from SLOT_OPTIONS
     SLOTS = """|-----\\/-----------\\/-----------\\/-----|\n|%s|%s|%s|\n|-----/\\-----------/\\-----------/\\-----|"""
 
+    # Prompts UNIQUE to startup sequence.
     class Title:
         TITLE_INTRO = "Welcome to the Slot Machine"
         TITLE_PROMPT = "Press " + Style.HIGHLIGHT + "ENTER" + Style.DEFAULT + " to start the game!"
 
+    # Text that provides user with information based on changing variables while the program runs.
     class Info:
         CREDIT_COUNT = "You have " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " credits."
         BET_AMOUNT = "Bet amount: " + Style.HIGHLIGHT + "%d CREDITS" + Style.DEFAULT
@@ -63,6 +70,7 @@ class DisplayBlock:
         HELD_TRUE = "HELD"
         HELD_FALSE = "NOT HELD"
 
+    # Prompts given to the user while the program is running.
     class Options:
         BET_PROMPT = "Please input # of credits to bet:"
         BET_OPTIONS = Style.HIGHLIGHT + "        [1]  [2]  [5]  [10]" + Style.DEFAULT
@@ -70,6 +78,7 @@ class DisplayBlock:
         HOLD_OPTION = Style.HIGHLIGHT + "[%d]" + Style.DEFAULT + " ----- %s"
         QUIT = "Press " + Style.HIGHLIGHT + "[Q]" + Style.DEFAULT + " to quit."
 
+    # All the strings that will show on the QUIT SCREEN, such as player statistics.
     class GAMEOVER:
         GOODBYE = "Game Over, Thanks for Playing!"
         WIN_COUNT = "You won " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
@@ -78,20 +87,7 @@ class DisplayBlock:
         CREDIT_CHANGE = "TOTAL %s: " + Style.HIGHLIGHT + "%d" + " credits." + Style.DEFAULT
 
 
-
-    GOODBYE = """
-|==================================|
-|   Game Over, Thanks for Playing! |
-|==================================|
-|  You won: %3d spins.             |
-|  You lost: %3d spins.            |
-|  You started with %4d credits.  |
-|  You ended with %4d credits.    |
-|==================================|
-    """
-
-
-# Variable Declaration
+# --- Variable Declaration ---
 winAmount = -1
 didWin = False
 jackpot = 0
@@ -112,9 +108,16 @@ countSpinLoss = 0
 originalCredit = 0
 totalWinAmount = 0
 
-# Define Methods and Functions for printing different screens, hold toggle, and bet-reward calculations
+
+# --- Define Methods and Functions for printing different screens, hold toggle, and bet-reward calculations ---
+
+
+# toggleHold Function that toggles hold status for the selected slot #, slot # is taken as a parameter when called.
+# toggleHold is purely backend, and does not print out any result for the user.
 def toggleHold(slot):
     global hold1, hold2, hold3, canHold
+
+    # If block to check the selected slot # to toggle that slot's hold status.
     if slot == 1:
         hold1 = not hold1
     elif slot == 2:
@@ -125,11 +128,18 @@ def toggleHold(slot):
     Screen.holdOptionsScreen()
 
 
+# winCalculation is a function that calculates the result of the slots rolled by making comparisons between them, and
+# then calling upon Screen.winScreen with an OUTCOME CODE as a parameter.
+# winCalculation is called at the end of Screen. slotScreen, is purely backend, and does not print out any result for the user.
 def winCalculation():
     global slots_array, credit, jackpot, didWin, winAmount
 
     didWin = True
-    if slots_array[0] == SLOT_OPTIONS[0] and slots_array[1] != SLOT_OPTIONS[0] and slots_array[2] != SLOT_OPTIONS[0]:
+
+    # If BLOCK that makes comparisons to identify if the player has a winning combination, recording their winAmount,
+    # and then calling upon Screen.winScreen with the win-type as a parameter. If no win is detected, the if BlOCK
+    # sets didWin to false and adds betAmount to the jackpot pool.
+    if slots_array[0] == SLOT_OPTIONS[0] and slots_array[1] != SLOT_OPTIONS[0]:
         winAmount = betAmount
         Screen.winScreen("CHERRY1")
     elif slots_array[0] == SLOT_OPTIONS[0] and slots_array[1] == SLOT_OPTIONS[0] and slots_array[2] != SLOT_OPTIONS[0]:
@@ -152,7 +162,7 @@ def winCalculation():
         Screen.winScreen("DIAMOND3")
     elif slots_array[0] == SLOT_OPTIONS[5] and slots_array[1] == SLOT_OPTIONS[5] and slots_array[2] == SLOT_OPTIONS[5]:
         winAmount = jackpot
-        # Remember to set jackpot to 0 inside of winScreen
+        # Remember to set jackpot to 0 inside winScreen
         Screen.winScreen("JACKPOT")
     else:
         winAmount = 0
@@ -161,7 +171,11 @@ def winCalculation():
         Screen.winScreen("LOSE")
 
 
+# The Screen class contains various functions that use the DisplayBlock class to print out screens in a modular manner.
+# The functions inside the Screen class also handle input detection.
 class Screen:
+
+    # Prints out Title screen.
     @staticmethod
     def titleScreen():
         os.system('cls || clear')
@@ -175,14 +189,10 @@ class Screen:
         print(DisplayBlock.BORDER)
         input()
 
+    # winScreenFlicker creates a flashing effect for when the user wins. The screen lets the user know they've won,
+    # and has a different message for a jackpot win (detected via a parameter of the function)
     @staticmethod
     def winScreenFlicker(message):
-        """
-        The function `winScreenFlicker` clears the console screen, displays various information and messages, and prints the
-        current state of a slot machine game.
-        
-        :param message: The `message` parameter is a string that represents the message to be displayed on the win screen
-        """
         os.system('cls||clear')
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
@@ -197,6 +207,10 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.BET_AMOUNT % betAmount))
         print(DisplayBlock.BORDER)
 
+    # This function is called by winCalculation. Taking the outcome from winCalculation, this function constructs
+    # and prints a winning/losing screen for the user. If the user has won, the function also calls upon
+    # Screen.winScreenFlicker, to create a flashing winning effect to congratulate the user. Ends by
+    # calling betScreenOptions to get the user to play again.
     @staticmethod
     def winScreen(outcome):
         global winMessage, betAmount, winOutput, winAmount, credit, jackpot, didWin, countSpinWin, countSpinLoss
@@ -209,6 +223,7 @@ class Screen:
             countSpinWin += 1
         elif didWin:
             winMessage = "WINNER!!"
+            countSpinWin += 1
         else:
             winMessage = "Better luck next time!"
             countSpinLoss += 1
@@ -225,6 +240,9 @@ class Screen:
         else:
             Screen.winScreenFlicker(winOutput)
 
+        # After screenFlicker is finished, prints out a final winning/losing message that lets the user know how much
+        # they won, or wishes them good luck if they lost.
+
         os.system('cls || clear')
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
@@ -233,17 +251,20 @@ class Screen:
         print(DisplayBlock.SLOTS % (slots_array[0], slots_array[1], slots_array[2]))
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % "")
+
+        # Check to see if win or loss.
         if didWin:
+
+            # Edge-case scenario where jackpot is greater than 100000
             if winAmount > 100000:
                 print(DisplayBlock.DEFAULT % ("You won:"))
                 print(DisplayBlock.DEFAULT_HIGHLIGHT % ((Style.HIGHLIGHT + " %2d CREDITS" + Style.DEFAULT) % winAmount))
             else:
                 print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                         ("You won:" + Style.HIGHLIGHT + " %2d CREDITS" + Style.DEFAULT) % winAmount))
-
-
         else:
             print(DisplayBlock.DEFAULT % winMessage)
+
         print(DisplayBlock.DEFAULT % "")
         print(DisplayBlock.DIVIDER)
         print(
@@ -252,6 +273,9 @@ class Screen:
         input()
         Screen.betOptionsScreen()
 
+    # creditAdd is called by outOfCredits, when the user chooses to add more credits when they don't have enough.
+    # creditAdd adds the # of inputted credits to the total credit amount, and also the originalCredit amount
+    # in order to not skew the QUIT SCREEN's profit/loss calculations.
     @staticmethod
     def creditAdd():
         global credit, userInput, originalCredit
@@ -261,8 +285,12 @@ class Screen:
         print(DisplayBlock.BORDER)
         userInput = input().strip()
 
+        # Checks to see userInput is valid.
         if userInput.isnumeric():
             userInput = int(userInput)
+
+            # Checks to ensure that the credit amount after the addition won't exceed 10,000.
+            # If it does exceed 10,000, calls upon Screen.invalidInput with its own invalid-input code.
             if (credit + userInput) > 10000:
                 Screen.invalidInput("CREDITADD_TOOMUCH")
             else:
@@ -294,7 +322,7 @@ class Screen:
             Screen.creditAdd()
         elif userInput.upper() == 'Q':
             gameover = True
-            return
+            Screen.quitScreen()
         elif userInput.upper() == "":
             Screen.betOptionsScreen()
         else:
@@ -459,7 +487,7 @@ class Screen:
         userInput = input().upper().strip()
         if userInput.upper() == 'Q':
             gameover = True
-            return
+            Screen.quitScreen()
         elif userInput in ['1', '2', '5', '10']:
             betAmount = int(userInput)
         else:
@@ -494,13 +522,18 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.WIN_COUNT % countSpinWin))
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.LOSE_COUNT % countSpinLoss))
         print(DisplayBlock.BORDER)
-        if credit-originalCredit > 0:
-            print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
+        if credit - originalCredit > 0:
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (
+                    DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "NICE JOB!" + Style.DEFAULT))
         else:
-            print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("LOSS", credit - originalCredit)))
+            print(DisplayBlock.DEFAULT_HIGHLIGHT % (
+                    DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("LOSS", -(credit - originalCredit))))
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "BETTER LUCK NEXT TIME!" + Style.DEFAULT))
         print(DisplayBlock.BORDER)
+        input()
+        exit()
+
 
 # Ask how many Credits you have today?
 userInput = input(
@@ -508,7 +541,8 @@ userInput = input(
 
 while not userInput.lstrip('-').isnumeric():
     os.system('cls || clear')
-    userInput = input("That isn't a number! Lets try again, this time just tell me the number of credits you have.\n").strip()
+    userInput = input(
+        "That isn't a number! Lets try again, this time just tell me the number of credits you have.\n").strip()
 
 userInput = int(userInput)
 if userInput > 10000:
