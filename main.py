@@ -11,12 +11,13 @@ dependent on what combination they roll and the bet inputted. When a player lose
 in the jackpot that will be given back to them if the user rolls a jackpot. The user may also choose
 to hold 2 out of 3 slots if they do not get a winning combination or haven't held last spin. When the user
 runs out of credits, they are given the opportunity to add more credits. When the user decides to Quit the game,
-a box will pop up letting them know of their game-statistics (ie. Wins, Losses, etc.)
+a box will pop up letting them know of their game-statistics (i.e. Wins, Losses, etc.)
 """
 # Imports
 import os
 import random
 import time
+
 
 # --- Constant Declaration ---
 
@@ -46,7 +47,8 @@ SLOT_OPTIONS = [Style.FRUIT + "   CH🍒RRY  " + Style.DEFAULT, Style.FRUIT + " 
 
 # DisplayBlock Class to store every possible printed line as a string, used later as modules to print a screen.
 class DisplayBlock:
-    # Blank, bordered lines. Different fieldwidths to account for Style.Highlight + Style.Default ANSI keycode characters.
+    # Blank, bordered lines. Different fieldwidths to account for Style.Highlight + Style.Default ANSI keycode
+    # characters.
     DEFAULT = "| %-36s |"
     DEFAULT_HIGHLIGHT = "| %-45s |"
 
@@ -408,7 +410,7 @@ class Screen:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                     "You can only hold " + Style.HIGHLIGHT + "MAX 2 SLOTS" + Style.DEFAULT))
         elif origin == "CREDITADD_TOOMUCH":
-            print(DisplayBlock.DEFAULT % ("Max Credit Carrying Capacity is"))
+            print(DisplayBlock.DEFAULT % "Max Credit Carrying Capacity is")
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "10,000" + Style.DEFAULT + " CREDITS"))
             print(DisplayBlock.DEFAULT % "Please enter a lower number.")
         else:
@@ -431,6 +433,9 @@ class Screen:
         else:
             Screen.outOfCredit()
 
+    # The function holdOptionsScreen prints a screen that displays to the user which slots are held and not held,
+    # and provides them with prompts to either toggle a hold or to spin the slot machine.
+    # holdOptionsScreen calls upon toggleHold and slotScreen to complete the actions described above.
     @staticmethod
     def holdOptionsScreen():
         global betAmount, userInput, hold1, hold2, hold3, canHold, slots_array
@@ -444,24 +449,31 @@ class Screen:
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % DisplayBlock.Options.HOLD_PROMPT)
         print(DisplayBlock.DIVIDER)
+
+        # Check the hold status of slot #1, and displays info accordingly.
         if hold1:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (1, DisplayBlock.Info.HELD_TRUE)))
         else:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (1, DisplayBlock.Info.HELD_FALSE)))
+
+        # Check the hold status of slot #2, and displays info accordingly.
         if hold2:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (2, DisplayBlock.Info.HELD_TRUE)))
         else:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (2, DisplayBlock.Info.HELD_FALSE)))
+
+        # Check the hold status of slot #3, and displays info accordingly.
         if hold3:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (3, DisplayBlock.Info.HELD_TRUE)))
         else:
             print(
                 DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Options.HOLD_OPTION % (3, DisplayBlock.Info.HELD_FALSE)))
+
         print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.BET_AMOUNT % betAmount))
         print(DisplayBlock.BORDER)
@@ -470,6 +482,11 @@ class Screen:
         print(DisplayBlock.BORDER)
 
         userInput = input().upper().strip()
+
+        # Checks user input. If user inputs a slot #, calls upon toggleHold with the slot# as a parameter. If a blank
+        # string is inputted, the program calls upon slotScreen and spins, and sets canHold to false if slots are
+        # held. The if statement also calls upon invalidInput with 2 different codes in 2 different cases,
+        # one for too many held slots, another for an unrecognized input.
         if not userInput.upper() == '1' and not userInput.upper() == '2' and not userInput.upper() == '3' and not userInput.upper() == "":
             Screen.invalidInput("HOLD")
         elif userInput.upper() == '1':
@@ -479,6 +496,11 @@ class Screen:
         elif userInput.upper() == '3':
             toggleHold(3)
         else:
+
+            # This if block checks to see if there are too many held slots (more than 2), and reports an invalid input
+            # with the specific code "3HOLD" using the function invalidInput(). The if block also checks if the user
+            # has actually held any slot or if they have spun with all slots free, which then determines if the user
+            # canHold on the next bet/spin.
             if hold1 and hold2 and hold3:
                 Screen.invalidInput("3HOLD")
             elif hold1 or hold2 or hold3:
@@ -488,11 +510,15 @@ class Screen:
                 canHold = True
                 Screen.slotScreen()
 
+    # betOptionsScreen is a screen that allows the user to either input a bet amount, or to quit the game.
+    # The function betOptionsScreen() is also the highest-level function, being called directly by a while loop.
+    # All other functions except the titleScreen are all called in chains from betOptionsScreen().
     @staticmethod
     def betOptionsScreen():
         global gameover, betAmount, userInput, hold1, hold2, hold3, canHold, slots_array
         os.system('cls || clear')
 
+        # Print out the screen and detect input
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.JACKPOT % jackpot))
@@ -505,9 +531,11 @@ class Screen:
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
         print(DisplayBlock.BORDER)
-
-        # Check Input
         userInput = input().upper().strip()
+
+        # This if block checks to see if the input is either a 'Q' for quit, or a valid bet option, then
+        # directs the user to the relevant screen. The betAmount is set to the inputted amount by the user.
+        # If no valid input is recognized, the user function invalidInput is called.
         if userInput.upper() == 'Q':
             gameover = True
             Screen.quitScreen()
@@ -516,11 +544,17 @@ class Screen:
         else:
             Screen.invalidInput("BET")
 
+        # This if block checks to see if the user should be allowed to hold next spin. If any slot was held,
+        # or they won, they cannot hold next spin.
         if hold1 or hold2 or hold3 or didWin:
             canHold = False
         else:
             canHold = True
 
+        # This if block checks to see if the user can afford the bet they want to input. If they cannot, it redirects
+        # them to the outOfCredit() screen. The if block also checks if the user can hold: If they can,
+        # they are directed to the hold screen. If they cannot hold, they are directed straight into a spin with
+        # their inputted bet amount.
         if credit <= 0 or credit < betAmount:
             Screen.outOfCredit()
         elif canHold:
@@ -534,9 +568,13 @@ class Screen:
             hold3 = False
             Screen.slotScreen()
 
+    # The function quitScreen is called whenever a user decides to quit the game. The function prints out
+    # a screen that provides the user with player-statistics.
     @staticmethod
     def quitScreen():
         os.system('cls || clear')
+
+        # Print out the statistics
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % DisplayBlock.GAMEOVER.GOODBYE)
         print(DisplayBlock.BORDER)
@@ -545,6 +583,9 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.WIN_COUNT % countSpinWin))
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.LOSE_COUNT % countSpinLoss))
         print(DisplayBlock.BORDER)
+
+        # This if block checks if the user has made a profit or a loss, and outputs a statistic and a message
+        # accordingly.
         if credit - originalCredit > 0:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                     DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
@@ -553,52 +594,69 @@ class Screen:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                     DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("LOSS", -(credit - originalCredit))))
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "BETTER LUCK NEXT TIME!" + Style.DEFAULT))
+
         print(DisplayBlock.BORDER)
         input()
         exit()
 
+# -- Startup Sequence --
 
-# Ask how many Credits you have today?
+# Ask how many Credits user has to start with.
 userInput = input(
     "As you walk into the Casino, you wonder how much you can afford.\nHow many credits did you bring with you?\n").strip()
 
+# Check to see if user input is a valid number. If it isn't a number, keep asking the user for new inputs.
 while not userInput.lstrip('-').isnumeric():
     os.system('cls || clear')
     userInput = input(
         "That isn't a number! Lets try again, this time just tell me the number of credits you have.\n").strip()
 
 userInput = int(userInput)
+
+# Check to see if the user inputted credit is greater than 10,000, and caps their credits at 10,000 along with a
+# notifying message. This is done to avoid breaking the program, which has a finite number of allowed digits.
 if userInput > 10000:
     os.system('cls || clear')
     print(
-        "Woah there buddy, you can only carry up to 10,000 credits for safety. Don't want to be robbed or something! I'll let you in with that amount.")
+        "Woah there buddy, you can only carry up to 10,000 credits for safety. Don't want to be robbed or something! "
+        "I'll let you in with that amount.")
     userInput = 10000
     input("Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to go to the slot machine.")
 
+# Checks to see if the inputted number is less than 5, and asks the user to input a higher number. This is done
+# to help player experience, as the game is un-fun if you start at just 5 credits.
 while userInput <= 5:
     os.system('cls || clear')
     userInput = input(
         "That's a sad amount! I'll give you as many credits you want, on the house!\nJust tell me how many you want:\n").strip()
+
+    # This while loop checks to see if the user input is numeric. If it isn't, the loop keeps prompting the user to
+    # input a number.
     while not userInput.isnumeric():
         os.system('cls || clear')
         userInput = input(
             "I need a number, not a story. Just give me the number of your dreams,\nand I'll give you that many!\n").strip()
+
     userInput = int(userInput)
+
+    # Check to see if the user inputted credit is greater than 10,000, and caps their credits at 10,000 along with a
+    # notifying message. This is done to avoid breaking the program, which has a finite number of allowed digits.
     if userInput > 10000:
         os.system('cls || clear')
         print(
             "Woah there buddy, don't put me out of business! Since you're being annoying, Ill just give you " + Style.HIGHLIGHT + "100 Credits" + Style.DEFAULT)
         userInput = 100
         input("Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to go to the slot machine.")
+
 credit = userInput
 originalCredit = credit
 
 # Print Out Intro
 Screen.titleScreen()
 
-# Main Loop
+# -- Main Loop --
 while not gameover:
     Screen.betOptionsScreen()
 
-# Goodbye Message
+#  -- Program Quit Message --
 Screen.quitScreen()
