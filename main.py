@@ -3,20 +3,20 @@ Programmer: Ryan Mehrian
 Date Created: December 12, 2023
 Last Modified: January
 -----
-This program is a game emulating a casino's slot machine. The user will start with 100
-"credits", and they will be given the choice to bet 1, 2, 5, or 10 credits, with each
-spin having 3 slots with 6 different possibilities (Cherry, Lemon, Lucky 7, Bar, Diamond,
-and Jackpot). The player will receive a reward depending on what they roll, and the bet
-they inputted at the start. When a player loses, their lost credits accrue in the jackpot
-that will be given back to them if the user rolls a jackpot. The player may also choose
-to hold 2 out of 3 slots if they do not get a winning combination.
+This program is a game emulating a casino's slot machine. The user is prompted with a dialogue where they have the
+opportunity to input a number of starting credits on startup. Once the game starts,
+they will be given the choice to bet 1, 2, 5, or 10 credits, with each spin having 3 slots with
+6 different possibilities (Cherry, Lemon, Lucky 7, Bar, Diamond, and Jackpot). The user will receive a reward
+dependent on what combination they roll and the bet inputted. When a player loses, their lost credits accrue
+in the jackpot that will be given back to them if the user rolls a jackpot. The user may also choose
+to hold 2 out of 3 slots if they do not get a winning combination or haven't held last spin. When the user
+runs out of credits, they are given the opportunity to add more credits. When the user decides to Quit the game,
+a box will pop up letting them know of their game-statistics (ie. Wins, Losses, etc.)
 """
 # Imports
 import os
 import random
 import time
-import math
-
 
 # --- Constant Declaration ---
 
@@ -273,7 +273,7 @@ class Screen:
         input()
         Screen.betOptionsScreen()
 
-    # creditAdd is called by outOfCredits, when the user chooses to add more credits when they don't have enough.
+    # creditAdd is called by function outOfCredit, when the user chooses to add more credits.
     # creditAdd adds the # of inputted credits to the total credit amount, and also the originalCredit amount
     # in order to not skew the QUIT SCREEN's profit/loss calculations.
     @staticmethod
@@ -299,11 +299,15 @@ class Screen:
         else:
             Screen.invalidInput("CREDITADD")
 
+    # The function outOfCredit is a screen that appears when the user inputs a bet that they cannot afford.
+    # The function brings up a prompt letting the user know they are short on credits, and provides the
+    # player with options to add more credits, choose a cheaper bet, or to quit the game.
     @staticmethod
     def outOfCredit():
         global userInput, credit, gameover
         os.system('cls || clear')
 
+        # Printing out the screen, prompt, and options.
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "Not enough Credits!" + Style.DEFAULT))
         print(DisplayBlock.BORDER)
@@ -317,7 +321,11 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % DisplayBlock.Options.QUIT)
         print(DisplayBlock.BORDER)
 
+        # Take user input
         userInput = input().upper().strip()
+
+        # Checks for user input, and then redirects to relevant screen. If a valid input isn't detected,
+        # Screen.invalidInput is called with the error code "CREDITOPTIONS".
         if userInput.upper() == '+':
             Screen.creditAdd()
         elif userInput.upper() == 'Q':
@@ -328,11 +336,19 @@ class Screen:
         else:
             Screen.invalidInput("CREDITOPTIONS")
 
+    # The function slotScreen deals with the spinning of the slot machine.
+    # slotScreen randomizes the slots in each printed frame. The frames slow down, then the slot machine
+    # comes to a complete stop. The program then waits for 2 second for suspense, followed by the calling of
+    # the function winCalculation to continue the program.
     @staticmethod
     def slotScreen():
         global credit, betAmount, hold1, hold2, hold3, slots_array, oldSlot
         os.system('cls || clear')
+
+        # Subtract the user bet from the user credit account
         credit -= betAmount
+
+        # For Loop, dealing with the 20 frames of slot spinning.
         for i in range(20):
 
             # Check for Holds, and ensure that every new animation is a new slot type (No repeat Cherries)
@@ -349,11 +365,11 @@ class Screen:
                 while oldSlot == slots_array[2]:
                     slots_array[2] = random.choice(SLOT_OPTIONS)
 
-            # To stop flickering, slow down speed
+            # To stop flickering, slow down speed at which the frame refreshes.
             time.sleep(1 / 3)
 
+            # Timer to make the slot machine slow down to a rolling stop towards the end of the spin.
             if i > 17:
-                # Timer to make the slot machine slow down to a rolling stop.
                 time.sleep(((i - 10) ** 0.6) / 3)
 
             os.system('cls || clear')
@@ -374,6 +390,10 @@ class Screen:
         time.sleep(2)
         winCalculation()
 
+    # The function invalidInput is a general purpose function that is used to handle unexpected inputs.
+    # It takes an origin as its parameter, which is the error code passed down from where it was called.
+    # invalidInput then uses this origin error code to decide how to proceed, outputting different error
+    # messages as needed and redirecting the user back to the relevant screen.
     @staticmethod
     def invalidInput(origin):
         os.system('cls || clear')
@@ -382,7 +402,8 @@ class Screen:
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
         print(DisplayBlock.BORDER)
 
-        # Make Error message more precise for too many holds
+        # Checks for origin codes that require a specific/constructive error output, and prints out the relevant
+        # error. If the origin code does not require a special message, prints out generic "INVALID INPUT" line.
         if origin == "3HOLD":
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                     "You can only hold " + Style.HIGHLIGHT + "MAX 2 SLOTS" + Style.DEFAULT))
@@ -392,21 +413,23 @@ class Screen:
             print(DisplayBlock.DEFAULT % "Please enter a lower number.")
         else:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
-
         print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                 "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to try again."))
         print(DisplayBlock.BORDER)
+
+        # Input to continue
         input()
 
+        # Check the origin code to decide which function/screen to redirect the user back to.
         if origin == "BET":
             Screen.betOptionsScreen()
         elif origin == "HOLD" or origin == "3HOLD":
             Screen.holdOptionsScreen()
-        elif origin == "CREDITOPTIONS":
-            Screen.outOfCredit()
         elif origin == "CREDITADD" or origin == "CREDITADD_TOOMUCH":
             Screen.creditAdd()
+        else:
+            Screen.outOfCredit()
 
     @staticmethod
     def holdOptionsScreen():
