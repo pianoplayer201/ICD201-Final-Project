@@ -81,7 +81,7 @@ class DisplayBlock:
         QUIT = "Press " + Style.HIGHLIGHT + "[Q]" + Style.DEFAULT + " to quit."
 
     # All the strings that will show on the QUIT SCREEN, such as player statistics.
-    class GAMEOVER:
+    class GameOver:
         GOODBYE = "Game Over, Thanks for Playing!"
         WIN_COUNT = "You won " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
         LOSE_COUNT = "You lost " + Style.HIGHLIGHT + "%d" + Style.DEFAULT + " spins."
@@ -96,7 +96,7 @@ jackpot = 0
 credit = 100
 oldSlot = ""
 betAmount = -1
-gameover = False
+gameOver = False
 slots_array = random.choices(SLOT_OPTIONS, k=3)
 userInput = ""
 canHold = True
@@ -306,7 +306,7 @@ class Screen:
     # player with options to add more credits, choose a cheaper bet, or to quit the game.
     @staticmethod
     def outOfCredit():
-        global userInput, credit, gameover
+        global userInput, credit, gameOver
         os.system('cls || clear')
 
         # Printing out the screen, prompt, and options.
@@ -331,7 +331,7 @@ class Screen:
         if userInput.upper() == '+':
             Screen.creditAdd()
         elif userInput.upper() == 'Q':
-            gameover = True
+            gameOver = True
             Screen.quitScreen()
         elif userInput.upper() == "":
             Screen.betOptionsScreen()
@@ -515,7 +515,7 @@ class Screen:
     # All other functions except the titleScreen are all called in chains from betOptionsScreen().
     @staticmethod
     def betOptionsScreen():
-        global gameover, betAmount, userInput, hold1, hold2, hold3, canHold, slots_array
+        global gameOver, betAmount, userInput, hold1, hold2, hold3, canHold, slots_array
         os.system('cls || clear')
 
         # Print out the screen and detect input
@@ -537,7 +537,7 @@ class Screen:
         # directs the user to the relevant screen. The betAmount is set to the inputted amount by the user.
         # If no valid input is recognized, the user function invalidInput is called.
         if userInput.upper() == 'Q':
-            gameover = True
+            gameOver = True
             Screen.quitScreen()
         elif userInput in ['1', '2', '5', '10']:
             betAmount = int(userInput)
@@ -576,23 +576,23 @@ class Screen:
 
         # Print out the statistics
         print(DisplayBlock.BORDER)
-        print(DisplayBlock.DEFAULT % DisplayBlock.GAMEOVER.GOODBYE)
+        print(DisplayBlock.DEFAULT % DisplayBlock.GameOver.GOODBYE)
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT % "STATISTICS:")
         print(DisplayBlock.DIVIDER)
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.WIN_COUNT % countSpinWin))
-        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GAMEOVER.LOSE_COUNT % countSpinLoss))
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GameOver.WIN_COUNT % countSpinWin))
+        print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.GameOver.LOSE_COUNT % countSpinLoss))
         print(DisplayBlock.BORDER)
 
         # This if block checks if the user has made a profit or a loss, and outputs a statistic and a message
         # accordingly.
         if credit - originalCredit > 0:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
+                    DisplayBlock.GameOver.CREDIT_CHANGE % ("PROFIT", credit - originalCredit)))
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "NICE JOB!" + Style.DEFAULT))
         else:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (
-                    DisplayBlock.GAMEOVER.CREDIT_CHANGE % ("LOSS", -(credit - originalCredit))))
+                    DisplayBlock.GameOver.CREDIT_CHANGE % ("LOSS", -(credit - originalCredit))))
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "BETTER LUCK NEXT TIME!" + Style.DEFAULT))
 
         print(DisplayBlock.BORDER)
@@ -655,7 +655,7 @@ originalCredit = credit
 Screen.titleScreen()
 
 # -- Main Loop --
-while not gameover:
+while not gameOver:
     Screen.betOptionsScreen()
 
 #  -- Program Quit Message --
