@@ -108,8 +108,6 @@ winOutput = ""
 countSpinWin = 0
 countSpinLoss = 0
 originalCredit = 0
-totalWinAmount = 0
-
 
 # --- Define Methods and Functions for printing different screens, hold toggle, and bet-reward calculations ---
 
