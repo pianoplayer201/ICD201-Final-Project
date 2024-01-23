@@ -192,7 +192,7 @@ class Screen:
     # winScreenFlicker creates a flashing effect for when the user wins. The screen lets the user know they've won,
     # and has a different message for a jackpot win (detected via a parameter of the function)
     @staticmethod
-    def winScreenFlicker(message):
+    def winScreenMessage(message):
         os.system('cls||clear')
         print(DisplayBlock.BORDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (DisplayBlock.Info.CREDIT_COUNT % credit))
@@ -236,9 +236,9 @@ class Screen:
                 else:
                     winOutput = ""
                 time.sleep(1)
-                Screen.winScreenFlicker(winOutput)
+                Screen.winScreenMessage(winOutput)
         else:
-            Screen.winScreenFlicker(winOutput)
+            Screen.winScreenMessage(winOutput)
 
         # After screenFlicker is finished, prints out a final winning/losing message that lets the user know how much
         # they won, or wishes them good luck if they lost.
