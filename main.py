@@ -413,6 +413,7 @@ class Screen:
             print(DisplayBlock.DEFAULT % "Please enter a lower number.")
         else:
             print(DisplayBlock.DEFAULT_HIGHLIGHT % (Style.HIGHLIGHT + "INVALID INPUT" + Style.DEFAULT))
+
         print(DisplayBlock.DIVIDER)
         print(DisplayBlock.DEFAULT_HIGHLIGHT % (
                 "Press " + Style.HIGHLIGHT + "[Enter]" + Style.DEFAULT + " to try again."))
